@@ -68,4 +68,34 @@ router.post("/client/register", (req, res) =>{
     });
 })
 
+// Modification infos client hors mot de passe
+router.put("/client/modification/:id", (req, res) =>{
+    const {nom_prenom_client, Telephone_client, Mail_client, adresse_client} = req.body;
+    const id_client = req.params.id;
+    db.query("UPDATE client SET nom_prenom_client = ?, Telephone_client = ?, Mail_client = ?, adresse_client = ? WHERE id_client = ?",
+        [nom_prenom_client, Telephone_client, Mail_client, adresse_client, id_client],
+        (err, result) =>{
+        if(err){
+            return res.status(500).json({message: "Erreur du serveur"});
+        }
+
+
+        res.status(200).json( {message: "Modification prise en compte"})
+    });
+});
+
+// Récupération de la liste des commandes d'un client
+router.get("/commande/client/:id", (req, res) =>{
+    const { id } = req.params;
+    db.query("SELECT * FROM commande WHERE id_client = ? ", [id], (err, result) =>{
+        if(err){
+            return res.status(500).json({message: "Erreur du serveur"});
+        }
+        if(result.length === 0)
+            return res.status(404).json({message: "Pas de commande"})
+
+        res.json(result);
+    });
+});
+
 module.exports = router;
