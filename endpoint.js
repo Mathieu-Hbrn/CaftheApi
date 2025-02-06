@@ -16,6 +16,20 @@ router.get("/produits", (req,res) =>{
     });
 });
 
+//Récupérer les produits d'une catégorie
+router.get("/produits/categorie/:id", (req,res) =>{
+    const categorieId = req.params.id ;
+    db.query("SELECT * FROM produit WHERE id_categorie = ? ", [categorieId], (err, result) =>{
+        if(err){
+            console.log(err)
+            return res.status(500).json({message: "Erreur du serveur"});
+        }
+        if(result.length === 0) {
+            return res.status(404).json({message: "La catégorie n'éxiste pas"})
+        } else res.json(result);
+    });
+});
+
 //Récupérer un produit par son id
 router.get("/produits/:id", (req, res) =>{
     const { id } = req.params;
