@@ -11,7 +11,8 @@ const {verifyToken} = require ("./middleware")
 route pour récuperer tout les produits
 GET /api/produits
 */
-router.get("/produits", verifyToken,(req,res) =>{
+router.get("/produits", verifyToken, (req,res) =>{
+
     db.query("SELECT * FROM produit", (err, result) =>{
         if(err){
             return res.status(500).json({message: "Erreur du serveur"});
