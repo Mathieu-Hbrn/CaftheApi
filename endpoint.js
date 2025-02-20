@@ -88,8 +88,8 @@ router.post("/client/register", (req, res) =>{
 })
 
 //acces fiche client
-router.get("/client/:id", (req, res) =>{
-    const { id } = req.params;
+router.get("/client/settings", verifyToken, (req, res) =>{
+    const id = verifyToken({user})
     db.query("SELECT * FROM client WHERE id_client = ?", [id], (err, result) =>{
         if(err){
             return res.status(500).json({message: "Erreur du serveur"});
@@ -169,9 +169,12 @@ router.post("/client/login", (req,res) => {
                 );
                 res.json({message: "Connexion réussie", token,
                     client: {
-                        id: client.Id_client,
+                        id: client.id_client,
                         nom: client.nom_prenom_client,
-                        email: client.Mail_client}})
+                        email: client.Mail_client,
+                        tel: client.Telephone_client,
+                        adresse: client.adresse_client,
+                        mdp: client.mdp_client}})
             });
     });
 });
