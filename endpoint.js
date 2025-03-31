@@ -198,6 +198,13 @@ router.get("/commande/client/:id", (req, res) =>{
 
 
 //detail commande client
+router.get("/status", (req, res) =>{
+
+    res.status(200).json({message: "v1.0"})
+});
+
+
+//detail commande client
 router.get("/detail_commande/:id", (req, res) =>{
     const { id } = req.params;
     db.query("SELECT * FROM lignecommande WHERE id_commande = ? ", [id], (err, result) =>{
