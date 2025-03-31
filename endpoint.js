@@ -11,7 +11,7 @@ const {verifyToken} = require ("./middleware")
 route pour récuperer tout les produits
 GET /api/produits
 */
-router.get("/produits", verifyToken, (req,res) =>{
+router.get("/produits", (req,res) =>{
 
     db.query("SELECT * FROM produit", (err, result) =>{
         if(err){
@@ -60,8 +60,8 @@ Exemple: JSON
 }
  */
 router.post("/client/register", (req, res) =>{
-    const {nom_prenom_client, Telephone_client, Date_inscription_client, Mail_client, mdp_client, adresse_client} = req.body;
-    db.query("SELECT * FROM client WHERE Mail_client = ?", [Mail_client], (err, result) =>{
+    const {nom_prenom, telephone, dateFormat, mail_register, mdp_register, adresse} = req.body;
+    db.query("SELECT * FROM client WHERE Mail_client = ?", [mail_register], (err, result) =>{
         if(err){
             return res.status(500).json({message: "Erreur du serveur"});
         }
@@ -72,12 +72,12 @@ router.post("/client/register", (req, res) =>{
     });
 
     //Hachage du mot de passe
-    bcrypt.hash(mdp_client, 10, (err, hash) =>{
+    bcrypt.hash(mdp_register, 10, (err, hash) =>{
         if (err) {
             return res.status(500).json({message: "Erreur lors du hachage du mot de passe"})
         }
         db.query("INSERT INTO client (nom_prenom_client, Telephone_client, Date_inscription_client, Mail_client, mdp_client, adresse_client) VALUES (?,?,?,?,?,?)",
-            [nom_prenom_client, Telephone_client, Date_inscription_client, Mail_client, hash, adresse_client],
+            [nom_prenom, telephone, dateFormat, mail_register, hash, adresse],
             (err, result) =>{
                 if (err) {
                     return res.status(500).json({message:"Erreur lors de l'inscription"});
