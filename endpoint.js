@@ -179,6 +179,32 @@ router.post("/client/login", (req,res) => {
     });
 });
 
+//suppression compte client (anonymisation)
+router.put("/client/suppr/:id", (req, res) => {
+    const id_client = parseInt(req.params.id);
+
+    if (isNaN(id_client)) {
+        return res.status(400).json({ message: "ID client invalide" });
+    }
+
+    db.query(
+        "UPDATE client SET nom_prenom_client = 'ANONYME', Telephone_client = '0000000000', Mail_client = 'ANONYME', adresse_client = 'ANONYME' WHERE id_client = ?",
+        [id_client],
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: "Erreur du serveur", error: err });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ message: "Client introuvable" });
+            }
+
+            res.status(200).json({ message: "Compte client supprimé avec succès" });
+        }
+    );
+});
+
+
 
 
 
@@ -197,9 +223,9 @@ router.get("/commande/client/:id", (req, res) =>{
 });
 
 
-//detail commande client
-router.get("/status", (req, res) =>{
 
+//test update git
+router.get("/status", (req, res) =>{
     res.status(200).json({message: "v1.0"})
 });
 
