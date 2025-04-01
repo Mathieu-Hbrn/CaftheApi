@@ -224,10 +224,7 @@ router.get("/commande/client/:id", (req, res) =>{
 
 
 
-//test update git
-router.get("/status", (req, res) =>{
-    res.status(200).json({message: "v1.0"})
-});
+
 
 
 //detail commande client
@@ -243,6 +240,60 @@ router.get("/detail_commande/:id", (req, res) =>{
         res.json(result);
     });
 });
+
+// Ajout commande
+router.post("/commande/ajout", (req, res) => {
+    const commande = req.body.commande;
+    const lignes_commande = req.body.lignes_commande;
+
+    if (!commande.id_client || lignes_commande.length === 0) {
+        return res.status(400).json({ message: "Données invalides" });
+    }
+
+
+
+        /*connection.beginTransaction(err => {
+            if (err) {
+                connection.release();
+                return res.status(500).json({ message: "Erreur lors de la transaction" });
+            }*/
+
+            // Insérer la commande
+            const sqlCommande = "INSERT INTO commande (Date_commande, status_commande, Montant_ht, Montant_tva, montant_ttc, adresse_livraison_commande, id_client, id_vendeur) VALUES (NOW(), 'En préparation', ?, ?, ?, ?, ?, 1)";
+            db.query(sqlCommande, [commande.Montant_ht, commande.Montant_tva, commande.Montant_ttc, commande.adresse_livraison_commande, commande.id_client], (err, result) => {
+                if(err){
+                    console.error(err)
+                    return res.status(500).json({message: "Erreur du serveur"});
+                }
+
+                const id_commande = result.insertId;
+
+                // Insérer les lignes de commande
+                const sqlLigneCommande =
+                    "INSERT INTO lignecommande (PrixUnitLigne, QuantiteProduitLigne, id_produit, id_commande) VALUES ?";
+                const valeursLignes = lignes_commande.map(lc => [lc.PrixUnitLigne, lc.QuantiteProduitLigne, lc.id_produit, id_commande]);
+
+                db.query(sqlLigneCommande, [valeursLignes], (err, result) => {
+                    if(err){
+                        return res.status(500).json({message: "Erreur du serveur2"});
+                    }
+
+                    // Valider la transaction
+                    db.commit(err => {
+                        if(err){
+                            return res.status(500).json({message: "Erreur du serveur3"});
+                        }
+
+                        res.status(201).json({ message: "Commande ajoutée avec succès", id_commande });
+                    });
+                });
+            });
+        });
+    ;
+
+
+
+
 
 
 module.exports = router;
